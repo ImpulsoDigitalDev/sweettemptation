@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dulces Delicias - Tortas & Quesillos Artesanales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .font-dancing { font-family: 'Dancing Script', cursive; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #f97316 0%, #dc2626 50%, #7c2d12 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .whatsapp-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        .floating { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        .modal-backdrop { backdrop-filter: blur(8px); }
+        .modal-enter { animation: modalEnter 0.3s ease-out; }
+        .modal-exit { animation: modalExit 0.3s ease-in; }
+        @keyframes modalEnter {
+          from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes modalExit {
+          from { opacity: 1; transform: scale(1) translateY(0); }
+          to { opacity: 0; transform: scale(0.9) translateY(-20px); }
+        }
+        .notification { animation: slideInRight 0.5s ease-out; }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideOutDown {
+          from { transform: translateY(0); opacity: 1; }
+          to { transform: translateY(20px); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-100">
+    <!-- Admin Password Modal -->
+    <div id="adminModal" class="fixed inset-0 z-[100] hidden">
+        <div class="modal-backdrop bg-black bg-opacity-30 absolute inset-0" onclick="closeAdminModal()"></div>
+        <div class="flex items-center justify-center min-h-screen p-4 relative z-10">
+            <div class="modal-enter bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden relative">
+                <div class="gradient-bg p-6 text-center">
+                    <div class="text-4xl mb-2">🔐</div>
+                    <h3 class="text-xl font-bold text-white">Acceso Administrador</h3>
+                    <p class="text-white/90 text-sm mt-1">Ingresa la contraseña para continuar</p>
+                </div>
+                <div class="p-6">
+                    <input 
+                        type="password" 
+                        id="adminPassword" 
+                        placeholder="Contraseña de administrador"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-300 text-gray-800 bg-white"
+                    >
+                    <div class="text-xs text-gray-500 mt-2">💡 Pista: sweetadmin2024</div>
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="closeAdminModal()" class="flex-1 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300 font-medium">
+                            Cancelar
+                        </button>
+                        <button onclick="verifyAdminPassword()" class="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-300 font-medium">
+                            Ingresar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-20 right-4 z-[90] space-y-2"></div>
+
+    <!-- Floating Navigation Menu -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-lg border-b border-white/20">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🍰</span>
+                    <span class="font-dancing text-2xl font-bold text-amber-800">Sweet Temptation</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#inicio" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Inicio</a>
+                    <a href="#productos" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Productos</a>
+                    <a href="#testimonios" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Testimonios</a>
+                    <a href="#contacto" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Contacto</a>
+                    <button id="adminBtn" onclick="openAdminModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-2 rounded-full font-semibold transition-all duration-300 text-sm">
+                        🔒 Admin
+                    </button>
+                    <button onclick="contactWhatsApp('Consulta general', '')" class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105">
+                        💬 Pedir Ahora
+                    </button>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-amber-800 hover:text-orange-600 transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden mt-4 pb-4 border-t border-white/20">
+                <div class="flex flex-col space-y-3 pt-4">
+                    <a href="#inicio" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Inicio</a>
+                    <a href="#productos" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Productos</a>
+                    <a href="#testimonios" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Testimonios</a>
+                    <a href="#contacto" class="text-amber-800 hover:text-orange-600 font-medium transition-colors duration-300">Contacto</a>
+                    <button id="adminBtnMobile" onclick="openAdminModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-2 rounded-full font-semibold transition-all duration-300 text-sm w-fit">
+                        🔒 Admin
+                    </button>
+                    <button onclick="contactWhatsApp('Consulta general', '')" class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-full font-semibold transition-all duration-300 w-fit">
+                        💬 Pedir Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Carousel -->
+    <header id="inicio" class="relative h-96 md:h-[500px] overflow-hidden shadow-lg mt-16">
+        <!-- Carousel Container -->
+        <div id="carousel" class="relative w-full h-full">
+            <!-- Slide 1 -->
+            <div class="carousel-slide absolute inset-0 gradient-bg flex items-center justify-center transition-transform duration-500 ease-in-out" data-slide="0">
+                <div class="text-center z-10 relative">
+                    <h1 class="font-dancing text-5xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
+                        🍰 Sweet Temptation
+                    </h1>
+                    <p class="text-white text-lg md:text-xl font-light mb-4">Tortas & Quesillos Artesanales</p>
+                    <div class="flex justify-center space-x-4 text-white text-sm md:text-base">
+                        <span class="flex items-center"><span class="mr-2">📍</span>Entrega a domicilio</span>
+                        <span class="flex items-center"><span class="mr-2">⭐</span>100% Artesanal</span>
+                        <span class="flex items-center"><span class="mr-2">💝</span>Hecho con amor</span>
+                    </div>
+                </div>
+                <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="carousel-slide absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 flex items-center justify-center transition-transform duration-500 ease-in-out translate-x-full" data-slide="1">
+                <div class="text-center z-10 relative cursor-pointer" onclick="uploadCarouselImage(1)">
+                    <div class="text-8xl mb-4 hover:scale-110 transition-transform duration-300">🍰</div>
+                    <h2 class="font-dancing text-4xl md:text-5xl text-white mb-2 drop-shadow-lg">Nuestras Tortas</h2>
+                    <p class="text-white text-lg">Haz clic para subir foto</p>
+                </div>
+                <img id="carousel-img-1" class="absolute inset-0 w-full h-full object-cover hidden" alt="Tortas Sweet Temptation">
+                <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="carousel-slide absolute inset-0 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-600 flex items-center justify-center transition-transform duration-500 ease-in-out translate-x-full" data-slide="2">
+                <div class="text-center z-10 relative cursor-pointer" onclick="uploadCarouselImage(2)">
+                    <div class="text-8xl mb-4 hover:scale-110 transition-transform duration-300">🍮</div>
+                    <h2 class="font-dancing text-4xl md:text-5xl text-white mb-2 drop-shadow-lg">Nuestros Quesillos</h2>
+                    <p class="text-white text-lg">Haz clic para subir foto</p>
+                </div>
+                <img id="carousel-img-2" class="absolute inset-0 w-full h-full object-cover hidden" alt="Quesillos Sweet Temptation">
+                <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="carousel-slide absolute inset-0 bg-gradient-to-br from-red-400 via-pink-500 to-rose-600 flex items-center justify-center transition-transform duration-500 ease-in-out translate-x-full" data-slide="3">
+                <div class="text-center z-10 relative cursor-pointer" onclick="uploadCarouselImage(3)">
+                    <div class="text-8xl mb-4 hover:scale-110 transition-transform duration-300">🧁</div>
+                    <h2 class="font-dancing text-4xl md:text-5xl text-white mb-2 drop-shadow-lg">Productos Especiales</h2>
+                    <p class="text-white text-lg">Haz clic para subir foto</p>
+                </div>
+                <img id="carousel-img-3" class="absolute inset-0 w-full h-full object-cover hidden" alt="Productos Especiales Sweet Temptation">
+                <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <button id="prevBtn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 z-20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 z-20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+
+        <!-- Play/Pause Button -->
+        <button id="playPauseBtn" class="absolute bottom-4 right-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 z-20">
+            <svg id="pauseIcon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+            </svg>
+            <svg id="playIcon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+        </button>
+
+        <!-- Dots Indicator -->
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+            <button class="carousel-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all duration-300" data-slide="0"></button>
+            <button class="carousel-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all duration-300" data-slide="1"></button>
+            <button class="carousel-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all duration-300" data-slide="2"></button>
+            <button class="carousel-dot w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-all duration-300" data-slide="3"></button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-16 px-4">
+        <div class="container mx-auto text-center">
+            <div class="floating mb-8">
+                <div class="text-8xl mb-4">🧁</div>
+            </div>
+            <h2 class="font-dancing text-4xl md:text-5xl text-gray-800 mb-6">
+                Endulza tus momentos especiales
+            </h2>
+            <p class="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto mb-8">
+                Creamos tortas y quesillos únicos para hacer de cada celebración un momento inolvidable. 
+                Ingredientes frescos, recetas tradicionales y mucho cariño en cada bocado.
+            </p>
+            <button onclick="scrollToProducts()" class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                Ver Nuestros Productos 🍰
+            </button>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="productos" class="py-16 px-4 bg-white">
+        <div class="container mx-auto">
+            <h2 class="font-dancing text-4xl md:text-5xl text-center text-gray-800 mb-12">
+                Nuestras Especialidades
+            </h2>
+            
+            <!-- Tortas -->
+            <div class="mb-16">
+                <h3 class="font-dancing text-3xl text-orange-600 mb-8 text-center">🍰 Tortas Artesanales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Torta Chocolate -->
+                    <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="uploadImage(this, 'torta-chocolate')">
+                            <div class="text-6xl group-hover:scale-110 transition-transform duration-300">🍫</div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-semibold">📷 Subir Foto</span>
+                            </div>
+                            <img id="img-torta-chocolate" class="absolute inset-0 w-full h-full object-cover hidden" alt="Torta de Chocolate">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-xl text-gray-800 mb-2">Torta de Chocolate</h4>
+                            <p class="text-gray-600 mb-4">Deliciosa torta de chocolate con cobertura de ganache y decoración artesanal</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-orange-600">$25.000</span>
+                                <button onclick="contactWhatsApp('Torta de Chocolate', '25000')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold whatsapp-pulse">
+                                    💬 Pedir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Torta Vainilla -->
+                    <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-yellow-100 to-amber-200 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="uploadImage(this, 'torta-vainilla')">
+                            <div class="text-6xl group-hover:scale-110 transition-transform duration-300">🍰</div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-semibold">📷 Subir Foto</span>
+                            </div>
+                            <img id="img-torta-vainilla" class="absolute inset-0 w-full h-full object-cover hidden" alt="Torta de Vainilla">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-xl text-gray-800 mb-2">Torta de Vainilla</h4>
+                            <p class="text-gray-600 mb-4">Suave torta de vainilla con crema chantilly y frutas frescas</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-orange-600">$22.000</span>
+                                <button onclick="contactWhatsApp('Torta de Vainilla', '22000')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold whatsapp-pulse">
+                                    💬 Pedir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Torta Red Velvet -->
+                    <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-red-100 to-pink-200 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="uploadImage(this, 'torta-red-velvet')">
+                            <div class="text-6xl group-hover:scale-110 transition-transform duration-300">❤️</div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-semibold">📷 Subir Foto</span>
+                            </div>
+                            <img id="img-torta-red-velvet" class="absolute inset-0 w-full h-full object-cover hidden" alt="Torta Red Velvet">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-xl text-gray-800 mb-2">Torta Red Velvet</h4>
+                            <p class="text-gray-600 mb-4">Exquisita torta red velvet con cream cheese y decoración elegante</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-orange-600">$28.000</span>
+                                <button onclick="contactWhatsApp('Torta Red Velvet', '28000')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold whatsapp-pulse">
+                                    💬 Pedir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quesillos -->
+            <div class="mb-16">
+                <h3 class="font-dancing text-3xl text-amber-600 mb-8 text-center">🍮 Quesillos Tradicionales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Quesillo Tradicional -->
+                    <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-yellow-100 to-orange-200 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="uploadImage(this, 'quesillo-tradicional')">
+                            <div class="text-6xl group-hover:scale-110 transition-transform duration-300">🍮</div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-semibold">📷 Subir Foto</span>
+                            </div>
+                            <img id="img-quesillo-tradicional" class="absolute inset-0 w-full h-full object-cover hidden" alt="Quesillo Tradicional">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-xl text-gray-800 mb-2">Quesillo Tradicional</h4>
+                            <p class="text-gray-600 mb-4">Quesillo casero con caramelo dorado, receta de la abuela</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-amber-600">$8.000</span>
+                                <button onclick="contactWhatsApp('Quesillo Tradicional', '8000')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold whatsapp-pulse">
+                                    💬 Pedir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quesillo de Coco -->
+                    <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-white to-yellow-100 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="uploadImage(this, 'quesillo-coco')">
+                            <div class="text-6xl group-hover:scale-110 transition-transform duration-300">🥥</div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-semibold">📷 Subir Foto</span>
+                            </div>
+                            <img id="img-quesillo-coco" class="absolute inset-0 w-full h-full object-cover hidden" alt="Quesillo de Coco">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-xl text-gray-800 mb-2">Quesillo de Coco</h4>
+                            <p class="text-gray-600 mb-4">Cremoso quesillo con coco rallado y toque tropical</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-amber-600">$9.000</span>
+                                <button onclick="contactWhatsApp('Quesillo de Coco', '9000')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold whatsapp-pulse">
+                                    💬 Pedir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quesillo de Chocolate -->
+                    <div class="bg-white rounded-2xl shadow-lg card-hover overflow-hidden">
+                        <div class="h-48 bg-gradient-to-br from-amber-100 to-yellow-200 flex items-center justify-center relative overflow-hidden group cursor-pointer" onclick="uploadImage(this, 'quesillo-chocolate')">
+                            <div class="text-6xl group-hover:scale-110 transition-transform duration-300">🍫</div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-semibold">📷 Subir Foto</span>
+                            </div>
+                            <img id="img-quesillo-chocolate" class="absolute inset-0 w-full h-full object-cover hidden" alt="Quesillo de Chocolate">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-xl text-gray-800 mb-2">Quesillo de Chocolate</h4>
+                            <p class="text-gray-600 mb-4">Irresistible quesillo con chocolate y caramelo especial</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-amber-600">$10.000</span>
+                                <button onclick="contactWhatsApp('Quesillo de Chocolate', '10000')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold whatsapp-pulse">
+                                    💬 Pedir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonios" class="py-16 px-4 gradient-bg">
+        <div class="container mx-auto">
+            <h2 class="font-dancing text-4xl text-white text-center mb-12">Lo que dicen nuestros clientes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white/90 backdrop-blur rounded-2xl p-6 text-center">
+                    <div class="text-4xl mb-4">⭐⭐⭐⭐⭐</div>
+                    <p class="text-gray-700 mb-4">"¡La torta de chocolate estaba increíble! Perfecta para el cumpleaños de mi hija."</p>
+                    <p class="font-semibold text-orange-600">- María González</p>
+                </div>
+                <div class="bg-white/90 backdrop-blur rounded-2xl p-6 text-center">
+                    <div class="text-4xl mb-4">⭐⭐⭐⭐⭐</div>
+                    <p class="text-gray-700 mb-4">"Los quesillos son como los de mi abuela. ¡Sabor auténtico y casero!"</p>
+                    <p class="font-semibold text-orange-600">- Carlos Rodríguez</p>
+                </div>
+                <div class="bg-white/90 backdrop-blur rounded-2xl p-6 text-center">
+                    <div class="text-4xl mb-4">⭐⭐⭐⭐⭐</div>
+                    <p class="text-gray-700 mb-4">"Excelente servicio y productos de calidad. ¡Totalmente recomendado!"</p>
+                    <p class="font-semibold text-orange-600">- Ana Martínez</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="py-16 px-4 bg-white">
+        <div class="container mx-auto text-center">
+            <h2 class="font-dancing text-4xl text-gray-800 mb-8">¿Listo para endulzar tu día?</h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+                Contáctanos por WhatsApp para hacer tu pedido personalizado. 
+                Entregamos en toda la ciudad con amor y puntualidad.
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <button onclick="contactWhatsApp('Consulta general', '')" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 whatsapp-pulse">
+                    💬 Contactar por WhatsApp
+                </button>
+                <div class="text-gray-600">
+                    <span class="block">📱 +57 300 123 4567</span>
+                    <span class="block">🕒 Lun - Dom: 8:00 AM - 8:00 PM</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 px-4">
+        <div class="container mx-auto text-center">
+            <h3 class="font-dancing text-3xl mb-4">🍰 Sweet Temptation</h3>
+            <p class="text-gray-400 mb-4">Hecho con amor para endulzar tu vida.</p>
+            <div class="flex justify-center space-x-6 text-2xl">
+                <span>🍰</span>
+                <span>🍮</span>
+                <span>🧁</span>
+                <span>🍫</span>
+                <span>❤️</span>
+            </div>
+            <p class="text-gray-500 text-sm mt-6">© 2025 Sweet Temptation. Designed by Leonova Studio.</p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Chat Widget -->
+    <div id="chatWidget" class="fixed bottom-6 right-6 z-50">
+        <!-- Chat Window -->
+        <div id="chatWindow" class="hidden mb-4 bg-white rounded-2xl shadow-2xl w-80 max-w-[calc(100vw-2rem)] overflow-hidden">
+            <!-- Header -->
+            <div class="bg-green-500 p-4 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <span class="text-lg">🍰</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">Sweet Temptation</h3>
+                            <p class="text-xs opacity-90">¡Estamos aquí para ayudarte!</p>
+                        </div>
+                    </div>
+                    <button onclick="closeChatWindow()" class="text-white hover:text-gray-200 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Chat Body -->
+            <div class="p-4 max-h-96 overflow-y-auto">
+                <!-- Welcome Message -->
+                <div class="mb-4">
+                    <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                        <p class="text-gray-700">¡Hola! 👋 Bienvenido a Sweet Temptation.</p>
+                        <p class="text-gray-700 mt-1">¿En qué podemos ayudarte hoy?</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Options -->
+                <div class="mb-4">
+                    <p class="text-xs text-gray-500 mb-2">Opciones rápidas:</p>
+                    <div class="space-y-2">
+                        <button onclick="selectQuickOption('Ver catálogo de tortas')" class="w-full text-left bg-green-50 hover:bg-green-100 text-green-700 p-2 rounded-lg text-sm transition-colors">
+                            🍰 Ver catálogo de tortas
+                        </button>
+                        <button onclick="selectQuickOption('Información sobre quesillos')" class="w-full text-left bg-green-50 hover:bg-green-100 text-green-700 p-2 rounded-lg text-sm transition-colors">
+                            🍮 Información sobre quesillos
+                        </button>
+                        <button onclick="selectQuickOption('Hacer pedido personalizado')" class="w-full text-left bg-green-50 hover:bg-green-100 text-green-700 p-2 rounded-lg text-sm transition-colors">
+                            ✨ Hacer pedido personalizado
+                        </button>
+                        <button onclick="selectQuickOption('Consultar precios y disponibilidad')" class="w-full text-left bg-green-50 hover:bg-green-100 text-green-700 p-2 rounded-lg text-sm transition-colors">
+                            💰 Consultar precios y disponibilidad
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Contact Form -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Tu nombre</label>
+                        <input type="text" id="chatName" placeholder="Ej: María González" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Tu mensaje</label>
+                        <textarea id="chatMessage" rows="3" placeholder="Escribe tu consulta aquí..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-gray-100">
+                <button onclick="sendChatMessage()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                    <span>Enviar por WhatsApp</span>
+                </button>
+                <p class="text-xs text-gray-500 text-center mt-2">Te redirigiremos a WhatsApp</p>
+            </div>
+        </div>
+        
+        <!-- Float Button -->
+        <button id="chatButton" onclick="toggleChatWindow()" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 whatsapp-pulse relative">
+            <svg id="whatsappIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+            </svg>
+            <svg id="closeIcon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+            <!-- Notification Badge -->
+            <div id="chatBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                1
+            </div>
+        </button>
+    </div>
+
+    <script>
+        function scrollToProducts() {
+            document.getElementById('productos').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Admin mode functionality
+        let isAdminMode = false;
+
+        function openAdminModal() {
+            const modal = document.getElementById('adminModal');
+            const passwordInput = document.getElementById('adminPassword');
+            modal.classList.remove('hidden');
+            passwordInput.value = '';
+            passwordInput.focus();
+            
+            // Close mobile menu if open
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+
+        function closeAdminModal() {
+            const modal = document.getElementById('adminModal');
+            modal.classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === 'sweetadmin2024') {
+                isAdminMode = true;
+                updateAdminButtons();
+                closeAdminModal();
+                showNotification('✅ Modo Administrador ACTIVADO', 'Ahora puedes subir y cambiar imágenes haciendo clic en las tarjetas.', 'success');
+            } else if (password.trim() !== '') {
+                showNotification('❌ Contraseña incorrecta', 'Verifica la contraseña e intenta nuevamente.', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function updateAdminButtons() {
+            const adminBtn = document.getElementById('adminBtn');
+            const adminBtnMobile = document.getElementById('adminBtnMobile');
+            
+            if (isAdminMode) {
+                adminBtn.innerHTML = '🔓 Admin ON';
+                adminBtn.className = 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-3 py-2 rounded-full font-semibold transition-all duration-300 text-sm';
+                adminBtn.onclick = toggleAdminMode;
+                
+                adminBtnMobile.innerHTML = '🔓 Admin ON';
+                adminBtnMobile.className = 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-3 py-2 rounded-full font-semibold transition-all duration-300 text-sm w-fit';
+                adminBtnMobile.onclick = toggleAdminMode;
+            } else {
+                adminBtn.innerHTML = '🔒 Admin';
+                adminBtn.className = 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-2 rounded-full font-semibold transition-all duration-300 text-sm';
+                adminBtn.onclick = openAdminModal;
+                
+                adminBtnMobile.innerHTML = '🔒 Admin';
+                adminBtnMobile.className = 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-2 rounded-full font-semibold transition-all duration-300 text-sm w-fit';
+                adminBtnMobile.onclick = openAdminModal;
+            }
+        }
+
+        function toggleAdminMode() {
+            isAdminMode = false;
+            updateAdminButtons();
+            showNotification('🔒 Modo Administrador DESACTIVADO', 'Las imágenes están protegidas para los visitantes.', 'info');
+        }
+
+        function showNotification(title, message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.className = `notification ${colors[type]} text-white p-4 rounded-lg shadow-lg max-w-sm`;
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="flex-1">
+                        <div class="font-semibold text-sm">${title}</div>
+                        <div class="text-xs mt-1 opacity-90">${message}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 transition-colors duration-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Handle Enter key in password modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const modal = document.getElementById('adminModal');
+                if (!modal.classList.contains('hidden')) {
+                    verifyAdminPassword();
+                }
+            }
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('adminModal');
+                if (!modal.classList.contains('hidden')) {
+                    closeAdminModal();
+                }
+            }
+        });
+
+        // Carousel functionality
+        let currentSlide = 0;
+        let isPlaying = true;
+        let carouselInterval;
+
+        function initCarousel() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.carousel-dot');
+            
+            // Update active dot
+            function updateDots() {
+                dots.forEach((dot, index) => {
+                    if (index === currentSlide) {
+                        dot.classList.add('bg-white');
+                        dot.classList.remove('bg-opacity-50');
+                    } else {
+                        dot.classList.remove('bg-white');
+                        dot.classList.add('bg-opacity-50');
+                    }
+                });
+            }
+
+            // Show specific slide
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    if (i === index) {
+                        slide.style.transform = 'translateX(0)';
+                    } else if (i < index) {
+                        slide.style.transform = 'translateX(-100%)';
+                    } else {
+                        slide.style.transform = 'translateX(100%)';
+                    }
+                });
+                updateDots();
+            }
+
+            // Next slide
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            // Previous slide
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            // Auto play
+            function startAutoPlay() {
+                carouselInterval = setInterval(nextSlide, 4000);
+            }
+
+            function stopAutoPlay() {
+                clearInterval(carouselInterval);
+            }
+
+            // Toggle play/pause
+            function togglePlayPause() {
+                const playIcon = document.getElementById('playIcon');
+                const pauseIcon = document.getElementById('pauseIcon');
+                
+                if (isPlaying) {
+                    stopAutoPlay();
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                } else {
+                    startAutoPlay();
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                }
+                isPlaying = !isPlaying;
+            }
+
+            // Event listeners
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                nextSlide();
+                if (isPlaying) {
+                    stopAutoPlay();
+                    startAutoPlay(); // Reset timer
+                }
+            });
+
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                prevSlide();
+                if (isPlaying) {
+                    stopAutoPlay();
+                    startAutoPlay(); // Reset timer
+                }
+            });
+
+            document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+
+            // Dot navigation
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    showSlide(currentSlide);
+                    if (isPlaying) {
+                        stopAutoPlay();
+                        startAutoPlay(); // Reset timer
+                    }
+                });
+            });
+
+            // Initialize
+            showSlide(0);
+            startAutoPlay();
+
+            // Pause on hover
+            const carousel = document.getElementById('carousel');
+            carousel.addEventListener('mouseenter', () => {
+                if (isPlaying) stopAutoPlay();
+            });
+            carousel.addEventListener('mouseleave', () => {
+                if (isPlaying) startAutoPlay();
+            });
+        }
+
+        function uploadCarouselImage(slideIndex) {
+            if (!isAdminMode) {
+                showNotification('🔒 Acceso Restringido', 'Para subir imágenes, activa el Modo Admin desde el menú superior.', 'info');
+                return;
+            }
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.getElementById(`carousel-img-${slideIndex}`);
+                        img.src = e.target.result;
+                        img.classList.remove('hidden');
+                        showNotification('📷 Imagen Subida', 'La imagen del carrusel se ha actualizado correctamente.', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            document.body.appendChild(input);
+            input.click();
+            document.body.removeChild(input);
+        }
+
+        function uploadImage(container, productId) {
+            if (!isAdminMode) {
+                showNotification('🔒 Acceso Restringido', 'Para subir imágenes, activa el Modo Admin desde el menú superior.', 'info');
+                return;
+            }
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.getElementById(`img-${productId}`);
+                        const emoji = container.querySelector('div:first-child');
+                        const overlay = container.querySelector('.absolute.inset-0.bg-black');
+                        
+                        img.src = e.target.result;
+                        img.classList.remove('hidden');
+                        emoji.style.display = 'none';
+                        
+                        // Update overlay text
+                        overlay.innerHTML = '<span class="text-white font-semibold">📷 Cambiar Foto</span>';
+                        
+                        showNotification('📷 Imagen Actualizada', 'La imagen del producto se ha actualizado correctamente.', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            document.body.appendChild(input);
+            input.click();
+            document.body.removeChild(input);
+        }
+
+        function contactWhatsApp(producto, precio) {
+            const phoneNumber = '18687786115'; // Cambia por tu número real
+            let message = '';
+            
+            if (producto === 'Consulta general') {
+                message = '¡Hola! Me interesa conocer más sobre sus productos de Sweet Temptation 🍰';
+            } else {
+                message = `¡Hola! Me interesa el ${producto} por $${precio}. ¿Podrían darme más información? 🍰`;
+            }
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Chat Widget Functions
+        function toggleChatWindow() {
+            const chatWindow = document.getElementById('chatWindow');
+            const whatsappIcon = document.getElementById('whatsappIcon');
+            const closeIcon = document.getElementById('closeIcon');
+            const chatBadge = document.getElementById('chatBadge');
+            
+            if (chatWindow.classList.contains('hidden')) {
+                // Open chat
+                chatWindow.classList.remove('hidden');
+                chatWindow.style.animation = 'slideInUp 0.3s ease-out';
+                whatsappIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+                chatBadge.classList.add('hidden');
+            } else {
+                // Close chat
+                closeChatWindow();
+            }
+        }
+
+        function closeChatWindow() {
+            const chatWindow = document.getElementById('chatWindow');
+            const whatsappIcon = document.getElementById('whatsappIcon');
+            const closeIcon = document.getElementById('closeIcon');
+            
+            chatWindow.style.animation = 'slideOutDown 0.3s ease-in';
+            setTimeout(() => {
+                chatWindow.classList.add('hidden');
+                whatsappIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }, 300);
+        }
+
+        function selectQuickOption(option) {
+            const messageTextarea = document.getElementById('chatMessage');
+            messageTextarea.value = option;
+            messageTextarea.focus();
+        }
+
+        function sendChatMessage() {
+            const name = document.getElementById('chatName').value.trim();
+            const message = document.getElementById('chatMessage').value.trim();
+            
+            if (!name) {
+                showNotification('📝 Nombre requerido', 'Por favor ingresa tu nombre para continuar.', 'error');
+                document.getElementById('chatName').focus();
+                return;
+            }
+            
+            if (!message) {
+                showNotification('💬 Mensaje requerido', 'Por favor escribe tu consulta antes de enviar.', 'error');
+                document.getElementById('chatMessage').focus();
+                return;
+            }
+            
+            // Format message for WhatsApp
+            const phoneNumber = '18687786115'; // Cambia por tu número real
+            const whatsappMessage = `¡Hola! Soy ${name} 👋\n\n${message}\n\n_Mensaje enviado desde Sweet Temptation 🍰_`;
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            // Show success notification
+            showNotification('✅ ¡Perfecto!', 'Te redirigimos a WhatsApp para completar tu consulta.', 'success');
+            
+            // Clear form
+            document.getElementById('chatName').value = '';
+            document.getElementById('chatMessage').value = '';
+            
+            // Close chat and redirect
+            setTimeout(() => {
+                closeChatWindow();
+                window.open(whatsappUrl, '_blank');
+            }, 1500);
+        }
+
+        // Mobile menu functionality
+        function initMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when clicking on links
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+
+        // Smooth scroll for navigation links
+        function initSmoothScroll() {
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize carousel
+            initCarousel();
+            
+            // Initialize mobile menu
+            initMobileMenu();
+            
+            // Initialize smooth scroll
+            initSmoothScroll();
+            
+            // Add some interactive effects
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9768b3711745c5ac',t:'MTc1NjQzNTQwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
